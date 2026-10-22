@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-body: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+
+  --color-cream: #faf6ef;
+  --color-cream-deep: #f3ecdd;
+  --color-card: #fffdf8;
+  --color-ink: #262019;
+  --color-clay: #ce5a33;
+  --color-clay-deep: #a8431f;
+  --color-fern: #5f8461;
+  --color-butter: #f2b33d;
+  --color-sky: #7fa9be;
+  --color-blush: #efd9c2;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(206, 90, 51, 0.22);
+}
+
+/* Subtle film grain over everything for a premium print feel */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+}
+
+/* ---- Marquee ---- */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+.animate-marquee-fast {
+  animation: marquee 22s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-fast {
+    animation: none;
+  }
+}
+
+/* ---- Ambient motion ---- */
+@keyframes spin-slower {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slower {
+  animation: spin-slower 18s linear infinite;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+.floaty {
+  animation: floaty 6s ease-in-out infinite;
+}
+.floaty-late {
+  animation: floaty 7s ease-in-out 1.2s infinite;
+}
+
+/* ---- Wavy nav underline ---- */
+.nav-squiggle {
+  position: relative;
+}
+.nav-squiggle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='6' viewBox='0 0 40 6'%3E%3Cpath d='M0 3 Q 5 0 10 3 T 20 3 T 30 3 T 40 3' fill='none' stroke='%23CE5A33' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 40px 6px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-squiggle:hover::after,
+.nav-squiggle[data-active="true"]::after {
+  transform: scaleX(1);
+}
+
+/* ---- Form fields ---- */
+.field {
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(38, 32, 25, 0.16);
+  background: rgba(255, 253, 248, 0.85);
+  padding: 0.72rem 1rem;
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+.field::placeholder {
+  color: rgba(38, 32, 25, 0.38);
+}
+.field:focus {
+  border-color: var(--color-clay);
+  box-shadow: 0 0 0 4px rgba(206, 90, 51, 0.14);
+  background: #fffdf8;
+}
+.field[data-invalid="true"] {
+  border-color: #c1382f;
+  box-shadow: 0 0 0 4px rgba(193, 56, 47, 0.12);
+}
+
+/* ---- Slim scrollbars for drawers ---- */
+.scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(38, 32, 25, 0.18) transparent;
+}
+.scroll-slim::-webkit-scrollbar {
+  width: 5px;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: rgba(38, 32, 25, 0.18);
+  border-radius: 999px;
+}
+
+/* Hide horizontal scrollbar on carousels while keeping snap scroll */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
