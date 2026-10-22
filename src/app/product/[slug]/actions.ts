@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
+import { ensureDbReady } from "@/db/bootstrap";
 import { products, reviews } from "@/db/schema";
 
 export type ReviewFormState = { ok: true } | { ok: false; error: string };
@@ -24,6 +25,8 @@ export async function addReview(
   if (rating < 1 || rating > 5) {
     return { ok: false, error: "Please pick a star rating." };
   }
+
+  await ensureDbReady();
 
   const product = await db
     .select({ id: products.id })

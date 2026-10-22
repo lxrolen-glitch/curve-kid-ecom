@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import { ensureDbReady } from "@/db/bootstrap";
 import { newsletterSubscribers } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,7 @@ export async function POST(request: Request) {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return Response.json({ ok: false, error: "Invalid email" }, { status: 400 });
     }
+    await ensureDbReady();
     await db
       .insert(newsletterSubscribers)
       .values({ email: email.trim().toLowerCase() })

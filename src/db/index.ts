@@ -3,13 +3,27 @@ import { Pool } from "pg";
 
 let cached: NodePgDatabase | null = null;
 
-function createDb(): NodePgDatabase {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
+/**
+ * Resolve the connection string. `DATABASE_URL` is canonical, but we also
+ * accept the names Vercel Storage (Neon/Postgres) injects automatically, so a
+ * freshly connected store works with zero manual configuration.
+ */
+function resolveDatabaseUrl(): string {
+  const url =
+    process.env.DATABASE_URL ??
+    process.env.POSTGRES_URL ??
+    process.env.POSTGRES_URL_NON_POOLING;
+  if (!url) {
     throw new Error(
       "DATABASE_URL is required — set it in your environment or in your hosting provider's project settings.",
     );
   }
+  return url;
+}
+
+function createDb(): NodePgDatabase {
+  const databaseUrl = resolveDatabaseUrl();
+  const isLocalhost = /(?:localhost|127\.0\.0\.1)/.test(databaseUrl);
 
   const globalForDb = globalThis as typeof globalThis & {
     __curvekidPostgresPool?: Pool;
@@ -19,6 +33,9 @@ function createDb(): NodePgDatabase {
     globalForDb.__curvekidPostgresPool ??
     new Pool({
       connectionString: databaseUrl,
+      // Hosted Postgres (Neon/Vercel/Supabase…) requires TLS; local dev does not.
+      ssl: isLocalhost ? undefined : { rejectUnauthorized: false },
+      max: 5,
     });
 
   if (process.env.NODE_ENV !== "production") {

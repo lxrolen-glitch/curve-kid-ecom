@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/db";
+import { ensureDbReady } from "@/db/bootstrap";
 import { orders, type OrderLine } from "@/db/schema";
 import { getProductsByIds } from "@/lib/data";
 import {
@@ -45,6 +46,8 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
   if (!Array.isArray(input.lines) || input.lines.length === 0) {
     return { ok: false, error: "Your basket is empty." };
   }
+
+  await ensureDbReady();
 
   // --- Re-price everything server-side; never trust client totals.
   const ids = input.lines.map((l) => l.id);

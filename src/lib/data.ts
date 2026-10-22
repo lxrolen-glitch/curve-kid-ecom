@@ -2,6 +2,7 @@ import { cache } from "react";
 import { avg, count, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { products, reviews } from "@/db/schema";
+import { ensureDbReady } from "@/db/bootstrap";
 
 export type Product = typeof products.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
@@ -73,6 +74,7 @@ export function toCardProduct(p: ProductWithRating): CardProduct {
 
 export const getAllProducts = cache(
   async (): Promise<ProductWithRating[]> => {
+    await ensureDbReady();
     const [all, ratings] = await Promise.all([
       db.select().from(products).orderBy(products.id),
       ratingsByProduct(),
@@ -86,6 +88,7 @@ export const getAllProducts = cache(
 
 export const getProductBySlug = cache(
   async (slug: string): Promise<ProductWithRating | null> => {
+    await ensureDbReady();
     const rows = await db
       .select()
       .from(products)
@@ -107,6 +110,7 @@ export const getProductBySlug = cache(
 
 export const getReviewsForProduct = cache(
   async (productId: number): Promise<Review[]> => {
+    await ensureDbReady();
     return db
       .select()
       .from(reviews)
@@ -117,6 +121,7 @@ export const getReviewsForProduct = cache(
 
 export const getTopReviews = cache(
   async (limit: number): Promise<(Review & { productName: string; productSlug: string })[]> => {
+    await ensureDbReady();
     const rows = await db
       .select({
         review: reviews,
@@ -151,6 +156,7 @@ export const getRelatedProducts = cache(
 );
 
 export async function getProductsByIds(ids: number[]) {
+  await ensureDbReady();
   if (ids.length === 0) return [];
   return db.select().from(products).where(inArray(products.id, ids));
 }

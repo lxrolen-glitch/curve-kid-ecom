@@ -3,6 +3,7 @@ import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { CheckCircle2, Package, PartyPopper, Truck } from "lucide-react";
 import { db } from "@/db";
+import { ensureDbReady } from "@/db/bootstrap";
 import { orders } from "@/db/schema";
 import { formatMoney } from "@/lib/format";
 import Reveal from "@/components/reveal";
@@ -16,6 +17,8 @@ export default async function SuccessPage({
 }) {
   const params = await searchParams;
   const orderId = typeof params.order === "string" ? params.order : "";
+
+  await ensureDbReady();
 
   const rows = orderId
     ? await db.select().from(orders).where(eq(orders.id, orderId)).limit(1)
